@@ -25,77 +25,24 @@ public class Main extends Application {
         primaryStage.show();
         root.requestFocus();
 
-        DatagramSocket ds1 = new DatagramSocket();
+        Client client = new Client();
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-
-                InetAddress ip = InetAddress.getLocalHost();
-
-
                 Timer timer = new Timer();
                 TimerTask task = new TimerTask() {
-
                     @Override
                     public void run() {
-                        try {
-                            byte buf[] = null;
-                            String coordinates = "1;" + characters.get(1).getX() + ";" + characters.get(1).getY();
-                            buf = coordinates.getBytes();
-                            DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip, 1235);
-                            ds1.send(DpSend);
-                        } catch (IOException e) {
-
-                        }
+                        String echo = client.sendMsg(characters.get(1).getX() + ";" + characters.get(1).getY());
                     }
                 };
                 timer.scheduleAtFixedRate(task, 0, 10);
                 return null;
-
-
             }
         };
         Thread thread = new Thread(task);
         thread.setDaemon(true);
         thread.start();
-
-        DatagramSocket ds = new DatagramSocket(1234);
-        Task<Void> task2 = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-
-
-                Timer timer2 = new Timer();
-                TimerTask task2 = new TimerTask() {
-
-                    @Override
-                    public void run() {
-                        try {
-                            byte[] receive = new byte[65535];
-                            DatagramPacket DpReceive = null;
-                            DpReceive = new DatagramPacket(receive, receive.length);
-                            ds.receive(DpReceive);
-                            String coordinates = data(receive).toString();
-                            String[] converted = coordinates.split(";");
-                            if (converted[0].equals("0")) {
-                                characters.get(0).setX(Double.parseDouble(converted[1]));
-                                characters.get(0).setY(Double.parseDouble(converted[2]));
-                            }
-                        } catch (IOException e) {
-
-                        }
-                    }
-                };
-                timer2.scheduleAtFixedRate(task2, 0, 10);
-                return null;
-
-
-            }
-        };
-        Thread thread2 = new Thread(task2);
-        thread2.setDaemon(true);
-        thread2.start();
-
     }
 
 
